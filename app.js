@@ -4,16 +4,22 @@ const mysql = require("mysql2");
 const app = express();
 
 const db = mysql.createConnection({
-  host: "mysql-2b4773ba-beainfanso22-8777.e.aivencloud.com",
-  user: "avnadmin",
-  password: "<redacted>",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   database: "defaultdb",
-  port: "19243",
+  port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 app.get("/", (req, res) => {
   db.query("SELECT NOW()", (err, result) => {
-    if (err) throw err;
+    if (err) {
+      console.error(err);
+      return res.send("Database connection failed");
+    }
     res.send("Database Connected Successfully: " + result[0]["NOW()"]);
   });
 });
